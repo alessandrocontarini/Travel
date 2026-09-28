@@ -20,3 +20,9 @@ struct TravelData{
         Experience(id: UUID(), title: "Parco di Kamenjack ", description: "Difficoltà facile", price: 18, imageName: "img2"),
         ]
 }
+
+
+// next step:
+// 1) Collegarci un DB reale (docker o online ad uso gratuito o roba fornita da gh)
+// 2) Proseguire aggiungendo dettagli grafici e funzionalità
+// 3) collega Gemini su XCode
