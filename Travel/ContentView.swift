@@ -27,23 +27,26 @@ struct ContentView: View {
                 } else {
                     List(experiences) { experience in
                         // Qui dentro puoi disporre gli elementi in orizzontale come preferisci!
-                        HStack(alignment: .center, spacing: 18) {
-                            Image(systemName: "map.fill")
-                                .font(.largeTitle)
-                                .foregroundColor(.blue)
+                        NavigationLink(destination: ExperienceDetailView(experience: experience)) {
                             
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(experience.title)
-                                    .font(.headline)
-                                Text(experience.description)
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                Text("Prezzo: €\(experience.price, specifier: "%.2f")")
-                                    .font(.footnote)
-                                    .bold()
+                            HStack(alignment: .center, spacing: 18) {
+                                Image(systemName: "map.fill")
+                                    .font(.largeTitle)
+                                    .foregroundColor(.blue)
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(experience.title)
+                                        .font(.headline)
+                                    Text(experience.description)
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    Text("Prezzo: €\(experience.price, specifier: "%.2f")")
+                                        .font(.footnote)
+                                        .bold()
+                                }
                             }
+                            .padding(.vertical, 4)
                         }
-                        .padding(.vertical, 4)
                     }
                 }
             }
