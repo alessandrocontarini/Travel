@@ -3,7 +3,7 @@
 //  Travel
 //
 //  Created by Alessandro Contarini on 28/09/2026.
-// Alebilly3?12!
+// PW db supabase Alebilly3?12! => Account GH
 
 import Foundation
 
@@ -25,9 +25,8 @@ struct TravelData{
 */
 
 // next step:
-// 1) Collegarci un DB reale (docker o online ad uso gratuito o roba fornita da gh) => uso Supabase
-// 2) Proseguire aggiungendo dettagli grafici e funzionalità
-// 3) collega Gemini su XCode
+// 1) aggiungi bottone per aggiungere istanze
+// 2) bottone per i dettagli ecc. di ciascuna experience
 
 
 
