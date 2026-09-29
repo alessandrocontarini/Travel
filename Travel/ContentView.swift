@@ -7,37 +7,72 @@
 //
 
 import SwiftUI
+import Supabase
+import PostgREST
 
 struct ContentView: View {
-    
-    let experiences = TravelData.someExperiences
-    
-    // body è il cuore di ogni vista in SwiftUI
-    // restituisce il contenuto visivo
-    
-    var body: some View {
-        NavigationStack { //contenitore che gestisce la navigazione
-            List(experiences) { experiences in
-                HStack(spacing: 12){
-                    Image(systemName: "map.fill")
-                        .font(.largeTitle)
-                        .foregroundColor(.blue)
-                    VStack(alignment: .leading, spacing: 4){
-                        Text(experiences.title).font(.headline)
-                        Text(experiences.description)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        Text("€\(String(format: "%.2f", experiences.price))").bold().foregroundColor(.accentColor)
+    @State private var experiences: [Experience] = [] //State è una proprietà di stato reattiva
+    @State private var errorMessage: String? = nil
 
+    var body: some View {
+        NavigationStack { //contenitore di navigazione std di iOS
+            // Usiamo uno stack condizionale pulito per gestire gli stati della vista
+            VStack { // contenitore verticale condizionale
+                if let errorMessage { //verifica se è nil
+                    Text("Errore: \(errorMessage)")
+                        .foregroundColor(.red)
+                        .padding()
+                } else if experiences.isEmpty {
+                    ProgressView("Caricamento esperienze...")
+                } else {
+                    List(experiences) { experience in
+                        // Qui dentro puoi disporre gli elementi in orizzontale come preferisci!
+                        HStack(alignment: .center, spacing: 18) {
+                            Image(systemName: "map.fill")
+                                .font(.largeTitle)
+                                .foregroundColor(.blue)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(experience.title)
+                                    .font(.headline)
+                                Text(experience.description)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Text("Prezzo: €\(experience.price, specifier: "%.2f")")
+                                    .font(.footnote)
+                                    .bold()
+                            }
                         }
+                        .padding(.vertical, 4)
                     }
-                .padding(.vertical, 4)
                 }
-            .navigationTitle ("Esperienze di Viaggio")
+            }
+            .navigationTitle("Esplora Viaggi")
+            .task {
+                await fetchExperiences() // avvia l'esecuzione asincrona
             }
         }
     }
-    
+
+    func fetchExperiences() async { //funzione asincrona
+        do {
+            let response: [Experience] = try await SupabaseManager.shared.client
+                .from("Experience")
+                .select()
+                .execute()
+                .value
+            
+            await MainActor.run { //garantisce che l'assegnazione a experiences avvenga dal thread principale, perché le chiamate di rete avvengono in bg
+                self.experiences = response
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = error.localizedDescription
+            }
+            print("Errore durante il fetch da Supabase: \(error)")
+        }
+    }
+}
     
 
 #Preview {
