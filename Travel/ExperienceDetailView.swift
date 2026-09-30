@@ -11,6 +11,8 @@ import SwiftUI
 struct ExperienceDetailView: View {
     // La vista riceve l'esperienza specifica su cui l'utente ha cliccato
     let experience: Experience
+    
+    @Environment(\.openURL) private var openURL 
 
     var body: some View {
         ScrollView {
@@ -30,6 +32,14 @@ struct ExperienceDetailView: View {
                                 .aspectRatio(contentMode: .fill)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .cornerRadius(8)
+                                .onTapGesture{
+                                    if let url = experience.mapsURL {
+                                        print("LINK TROVATO: \(url)")
+                                        openURL(url) { accepted in
+                                            print("L'apertura del link è riuscita? \(accepted)")
+                                        }
+                                    }
+                                }
                         @unknown default:
                             EmptyView()
                         }
@@ -57,9 +67,35 @@ struct ExperienceDetailView: View {
                 Text("Descrizione dell'esperienza")
                     .font(.headline)
                 
-                Text(experience.description)
-                    .font(.body)
-                    .foregroundColor(.primary)
+                VStack(alignment: .leading, spacing: 6){
+                    Text("Partenza: \(experience.partenza)")
+                    
+                    Text("Lunghezza: \(experience.km, specifier: "%.1f") km")
+                    
+                    Text("Durata totale: \(experience.durata, specifier: "%.2f") h")
+                }
+                    
+                Divider()
+                
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Principali tappe:")
+                        .font(.headline)
+                    
+                    // id: \.self dice a SwiftUI di usare la stringa stessa come identificatore univoco
+                    ForEach(Array(experience.steps.prefix(5)), id: \.self) { step in
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.blue)
+                                .font(.subheadline)
+                            
+                            Text(step)
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+                
 
                 Spacer()
             }
