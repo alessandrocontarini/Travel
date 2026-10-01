@@ -11,8 +11,9 @@ import SwiftUI
 struct ExperienceDetailView: View {
     // La vista riceve l'esperienza specifica su cui l'utente ha cliccato
     let experience: Experience
-    
-    @Environment(\.openURL) private var openURL 
+    @State private var showingEditSheet = false
+    var onExperienceUpdated: (() -> Void)? = nil
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         ScrollView {
@@ -102,5 +103,22 @@ struct ExperienceDetailView: View {
             .padding()
         }
         .navigationTitle("Dettaglio Viaggio")
+        .toolbar{
+            //Pulsante modifica
+            ToolbarItem(placement: .primaryAction){
+                Button(action:{
+                    showingEditSheet = true
+                }){
+                    Image(systemName: "pencil.circle.fill").font(.title2)
+                }
+            }
+        }
+        .sheet(isPresented: $showingEditSheet){
+            AddExperienceView(experienceToEdit: experience){
+                if let onExperienceUpdated{
+                    onExperienceUpdated()
+                }
+            }
+        }
     }
 }

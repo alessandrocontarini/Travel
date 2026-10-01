@@ -17,6 +17,8 @@ struct AddExperienceView: View {
     
     var onExperienceAdded: () -> Void //Closure => funzione passata come parametro, in attesa di essere eseguita. Vista quindi dal genitore (ContentView)
     
+    var experienceToEdit: Experience? = nil
+    
     // Siccome le viste sono immutabili, usiamo state per tenere traccia di quel valore in memoria
     @State private var title = ""
     @State private var description = ""
@@ -112,7 +114,7 @@ struct AddExperienceView: View {
                     }
                 }
             }
-            .navigationTitle("Nuova Esperienza")
+            .navigationTitle(experienceToEdit == nil ? "Nuova esperienza" : "Modifica esperienza")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Annulla") {
@@ -127,6 +129,23 @@ struct AddExperienceView: View {
                     }
                 }
             }
+            
+            .onAppear() { // .onAppear è un modificatore che viene eseguito appena viene visualizzata la schermata
+                if let exp = experienceToEdit {
+                        title = exp.title
+                        description = exp.description
+                        price = String(exp.price)
+                        linkMaps = exp.link_maps ?? ""
+                        partenza = exp.partenza
+                        km = String(exp.km)
+                        durata = String(exp.durata)
+
+                        if !exp.steps.isEmpty {
+                            stepsArray = exp.steps
+                        }
+                    }
+                }
+            
         }
     }
         
@@ -157,7 +176,7 @@ struct AddExperienceView: View {
         let kmDouble = Double(km) ?? 0.0
         let durataDouble = Double(durata) ?? 0.0
         
-        var imageNameFinal = "default.jpg"
+        var imageNameFinal = experienceToEdit?.image_name ?? "default.jpg"
         
         if let imageData = selectedImageData {
             let uniqueFileName = "\(UUID().uuidString).jpg"
@@ -204,15 +223,27 @@ struct AddExperienceView: View {
         )
 
         do {
-            print("Tentativo di invio a Supabase...")
-            try await SupabaseManager.shared.client
-                .from("Experience")
-                .insert(newExp)
-                .execute()
-            print("Inserimento riuscito con successo!")
-
+            
+            if let expToEdit = experienceToEdit{
+                //Modifica UPDATE
+                let id = expToEdit.id
+                try await SupabaseManager.shared.client
+                    .from("Experience")
+                    .update(newExp)
+                    .eq("id", value: id)
+                    .execute()
+                print("Modifica riuscita con successo!")
+            } else{
+                // Inserimento INSERT
+                try await SupabaseManager.shared.client
+                    .from("Experience")
+                    .insert(newExp)
+                    .execute()
+                print("Inserimento riuscito con successo!")
+            }
             await MainActor.run {
-                onExperienceAdded() // codice fornito dal contentView quando apre il modale                dismiss() //chiude la schermata modale
+                onExperienceAdded() // codice fornito dal contentView quando apre il modale
+                dismiss() //chiude la schermata modale
             }
         } catch {
             print("Errore durante il salvataggio dei dati su Supabase: \(error)")

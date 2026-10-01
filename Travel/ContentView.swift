@@ -26,33 +26,48 @@ struct ContentView: View {
                 } else if experiences.isEmpty {
                     ProgressView("Caricamento esperienze...")
                 } else {
-                    List(experiences) { experience in
-                        // Qui dentro puoi disporre gli elementi in orizzontale come preferisci!
-                        NavigationLink(destination: ExperienceDetailView(experience: experience)) {
-                            
-                            HStack(alignment: .center, spacing: 18) {
-                                Image(systemName: "map.fill")
-                                    .font(.largeTitle)
-                                    .foregroundColor(.blue)
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(experience.title)
-                                        .font(.headline)
-                                    Text(experience.description)
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                    Text("Prezzo: €\(experience.price, specifier: "%.2f")")
-                                        .font(.footnote)
-                                        .bold()
+                    List{
+                        // Gestione Backend
+                        ForEach(experiences){experience in
+                            // Qui dentro puoi disporre gli elementi in orizzontale come preferisci!
+                            NavigationLink(destination: ExperienceDetailView(experience: experience){
+                                Task{
+                                    await fetchExperiences()
                                 }
+                            }) {
+                                
+                                HStack(alignment: .center, spacing: 18) {
+                                    Image(systemName: "map.fill")
+                                        .font(.largeTitle)
+                                        .foregroundColor(.blue)
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(experience.title)
+                                            .font(.headline)
+                                        Text(experience.description)
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                        Text("Prezzo: €\(experience.price, specifier: "%.2f")")
+                                            .font(.footnote)
+                                            .bold()
+                                    }
+                                }
+                                .padding(.vertical, 4)
                             }
-                            .padding(.vertical, 4)
                         }
+                        .onDelete(perform: deleteExperience)
                     }
                 }
             }
             .navigationTitle("Esplora Viaggi")
             .toolbar{
+                // Gestione Frontend del VStack
+                // 1. BOTTONE MODIFICA
+                ToolbarItem(placement: .navigationBarLeading){
+                    EditButton()
+                }
+                
+                // 2. BOTTONE AGGIUNGI
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: {
                         showingAddView = true
@@ -77,6 +92,8 @@ struct ContentView: View {
         }
     }
 
+    // =====================================================================
+    // funzione asincrona per aggiornare la vista delle esperienze
     func fetchExperiences() async { //funzione asincrona
         do {
             let response: [Experience] = try await SupabaseManager.shared.client
@@ -93,6 +110,27 @@ struct ContentView: View {
                 self.errorMessage = error.localizedDescription
             }
             print("Errore durante il fetch da Supabase: \(error)")
+        }
+    }
+    
+    // =====================================================================
+    //funzione per eliminare l'esperienza dal db di Supabase
+    private func deleteExperience(at offsets: IndexSet){
+        Task{
+            for index in offsets{
+                let experienceToDelete: Experience = experiences[index]
+                let id = experienceToDelete.id
+                
+                do {
+                    try await SupabaseManager.shared.client.from("Experience").delete().eq("id", value: id).execute()
+                    
+                    print("Esperienza eliminata con successo")
+                }catch{
+                    print("Errore durante l'eliminazione su Supabase: \(error)")
+                }
+            }
+            
+            await fetchExperiences() //ricarica la lista
         }
     }
 }
