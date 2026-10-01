@@ -46,8 +46,8 @@ struct Experience: Identifiable, Codable { // ogni experience è unica, Codable 
 
 
 // next step:
-// 1) aggiungi bottone per aggiungere istanze
-// 2) bottone per i dettagli ecc. di ciascuna experience
+// 1) voglio capire come funziona bene addexperienceview e contentview
+// 2) Voglio aggiungere la modifica e l'eliminazione
 
 
 

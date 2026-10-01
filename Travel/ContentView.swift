@@ -13,10 +13,11 @@ import PostgREST
 struct ContentView: View {
     @State private var experiences: [Experience] = [] //State è una proprietà di stato reattiva
     @State private var errorMessage: String? = nil
+    @State private var showingAddView = false // stato per aprire/chiudere il modulo
 
     var body: some View {
         NavigationStack { //contenitore di navigazione std di iOS
-            // Usiamo uno stack condizionale pulito per gestire gli stati della vista
+            
             VStack { // contenitore verticale condizionale
                 if let errorMessage { //verifica se è nil
                     Text("Errore: \(errorMessage)")
@@ -51,6 +52,25 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Esplora Viaggi")
+            .toolbar{
+                ToolbarItem(placement: .primaryAction) {
+                    Button(action: {
+                        showingAddView = true
+                    }){
+                        Image(systemName: "plus.circle.fill").font(.title2)
+                    }
+                }
+            }
+            .sheet(isPresented: $showingAddView) {
+                AddExperienceView{
+                    //quello che c'è qua dentro è il contenuto che finisce in onExperienceAdd
+                    Task{
+                        await fetchExperiences()
+                    }
+                }
+            }
+            
+            
             .task {
                 await fetchExperiences() // avvia l'esecuzione asincrona
             }
