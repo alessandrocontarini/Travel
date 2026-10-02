@@ -42,7 +42,7 @@ struct ContentView: View {
                                         .foregroundColor(.blue)
                                     
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text(experience.title)
+                                        Text("\(experience.title) \(experience.type.rawValue)")
                                             .font(.headline)
                                         Text(experience.description)
                                             .font(.subheadline)

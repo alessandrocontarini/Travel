@@ -27,6 +27,7 @@ struct AddExperienceView: View {
     @State private var partenza = ""
     @State private var km = ""
     @State private var durata = ""
+    @State private var selectedTipologia : TipologiaEnum = .moto
     
     // Gestione delle tappe: la prima è sempre presente (obbligatoria), fino a un massimo di 5
     @State private var stepsArray: [String] = [""]
@@ -51,6 +52,15 @@ struct AddExperienceView: View {
                     }
                 }
 
+                Section(header: Text("Tipologia di Esperienza")) {
+                    Picker("Tipologia", selection: $selectedTipologia) {
+                        ForEach(TipologiaEnum.allCases) { tipo in
+                            Text(tipo.rawValue).tag(tipo).font(.headline)
+                        }
+                    }
+                    .pickerStyle(.segmented) // Oppure .menu a seconda dello stile che preferisci
+                }
+                
                 Section(header: Text("Informazioni Generali *")) {
                     TextField("Titolo", text: $title)
                     TextField("Descrizione", text: $description)
@@ -132,20 +142,21 @@ struct AddExperienceView: View {
             
             .onAppear() { // .onAppear è un modificatore che viene eseguito appena viene visualizzata la schermata
                 if let exp = experienceToEdit {
-                        title = exp.title
-                        description = exp.description
-                        price = String(exp.price)
-                        linkMaps = exp.link_maps ?? ""
-                        partenza = exp.partenza
-                        km = String(exp.km)
-                        durata = String(exp.durata)
+                    title = exp.title
+                    description = exp.description
+                    price = String(exp.price)
+                    linkMaps = exp.link_maps ?? ""
+                    partenza = exp.partenza
+                    km = String(exp.km)
+                    durata = String(exp.durata)
+                    selectedTipologia = exp.type
 
-                        if !exp.steps.isEmpty {
-                            stepsArray = exp.steps
-                        }
+                    if !exp.steps.isEmpty {
+                        stepsArray = exp.steps
                     }
                 }
-            
+            }
+        
         }
     }
         
@@ -208,6 +219,7 @@ struct AddExperienceView: View {
             let km: Double
             let durata: Double
             let steps: [String]
+            let type: String
         }
 
         let newExp = NewExperienceData(
@@ -219,7 +231,8 @@ struct AddExperienceView: View {
             partenza: trimmedPartenza,
             km: kmDouble,
             durata: durataDouble,
-            steps: cleanedSteps
+            steps: cleanedSteps,
+            type: selectedTipologia.rawValue
         )
 
         do {

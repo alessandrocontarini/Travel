@@ -21,6 +21,7 @@ struct Experience: Identifiable, Codable { // ogni experience è unica, Codable 
     let km: Double
     let durata: Double
     let steps: [String]
+    let type: TipologiaEnum
     
     
     var publicImageURL: URL? {
@@ -38,11 +39,19 @@ struct Experience: Identifiable, Codable { // ogni experience è unica, Codable 
         return URL(string:link)
     }
     
+
+    
     
 }
 
 
-
+enum TipologiaEnum: String, Codable, CaseIterable, Identifiable {
+    case trekking = "🚶"
+    case moto = "🏍️"
+    case bici = "🚴🏻"
+    
+    var id: String { self.rawValue }
+}
 
 
 // next step:
