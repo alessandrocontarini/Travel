@@ -44,7 +44,7 @@ struct ContentView: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text("\(experience.title) \(experience.type.rawValue)")
                                             .font(.headline)
-                                        Text(experience.description)
+                                        Text("Difficoltà: \(experience.difficoltà.rawValue)")
                                             .font(.subheadline)
                                             .foregroundColor(.secondary)
                                         Text("Prezzo: €\(experience.price, specifier: "%.2f")")

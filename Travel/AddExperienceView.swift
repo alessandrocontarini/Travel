@@ -21,13 +21,13 @@ struct AddExperienceView: View {
     
     // Siccome le viste sono immutabili, usiamo state per tenere traccia di quel valore in memoria
     @State private var title = ""
-    @State private var description = ""
     @State private var price = ""
     @State private var linkMaps = ""
     @State private var partenza = ""
     @State private var km = ""
     @State private var durata = ""
     @State private var selectedTipologia : TipologiaEnum = .moto
+    @State private var selectedDifficolta : DifficoltaEnum = .easy
     
     // Gestione delle tappe: la prima è sempre presente (obbligatoria), fino a un massimo di 5
     @State private var stepsArray: [String] = [""]
@@ -63,8 +63,16 @@ struct AddExperienceView: View {
                 
                 Section(header: Text("Informazioni Generali *")) {
                     TextField("Titolo", text: $title)
-                    TextField("Descrizione", text: $description)
                     TextField("Prezzo", text: $price)
+                }
+                
+                Section(header: Text("Seleziona la difficoltà")) {
+                    Picker("Difficoltà", selection: $selectedDifficolta) {
+                        ForEach(DifficoltaEnum.allCases) { diff in
+                            Text(diff.rawValue).tag(diff).font(.headline)
+                        }
+                    }
+                    .pickerStyle(.menu)
                 }
 
                 Section(header: Text("Dettagli Percorso *")) {
@@ -143,13 +151,13 @@ struct AddExperienceView: View {
             .onAppear() { // .onAppear è un modificatore che viene eseguito appena viene visualizzata la schermata
                 if let exp = experienceToEdit {
                     title = exp.title
-                    description = exp.description
                     price = String(exp.price)
                     linkMaps = exp.link_maps ?? ""
                     partenza = exp.partenza
                     km = String(exp.km)
                     durata = String(exp.durata)
                     selectedTipologia = exp.type
+                    selectedDifficolta = exp.difficoltà
 
                     if !exp.steps.isEmpty {
                         stepsArray = exp.steps
@@ -164,11 +172,10 @@ struct AddExperienceView: View {
     private func saveExperience() async {
         // 1. VALIDAZIONE CAMPI OBBLIGATORI
         let trimmedTitle = title.trimmingCharacters(in: .whitespaces)
-        let trimmedDesc = description.trimmingCharacters(in: .whitespaces)
         let trimmedPartenza = partenza.trimmingCharacters(in: .whitespaces)
         let cleanedSteps = stepsArray.map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
         
-        if trimmedTitle.isEmpty || trimmedDesc.isEmpty || price.isEmpty || trimmedPartenza.isEmpty || km.isEmpty || durata.isEmpty {
+        if trimmedTitle.isEmpty || price.isEmpty || trimmedPartenza.isEmpty || km.isEmpty || durata.isEmpty {
             await MainActor.run {
                 errorMessage = "Compila tutti i campi obbligatori (Titolo, Descrizione, Prezzo, Partenza, Km, Durata)."
             }
@@ -211,7 +218,6 @@ struct AddExperienceView: View {
 
         struct NewExperienceData: Encodable { // Encodable serve a impacchettare tutte le variabili in JSON pronto per il db
             let title: String
-            let description: String
             let price: Double
             let image_name: String
             let link_maps: String
@@ -220,11 +226,11 @@ struct AddExperienceView: View {
             let durata: Double
             let steps: [String]
             let type: String
+            let diff: String
         }
 
         let newExp = NewExperienceData(
             title: trimmedTitle,
-            description: trimmedDesc,
             price: priceDouble,
             image_name: imageNameFinal,
             link_maps: linkMaps,
@@ -232,7 +238,8 @@ struct AddExperienceView: View {
             km: kmDouble,
             durata: durataDouble,
             steps: cleanedSteps,
-            type: selectedTipologia.rawValue
+            type: selectedTipologia.rawValue,
+            diff: selectedDifficolta.rawValue
         )
 
         do {

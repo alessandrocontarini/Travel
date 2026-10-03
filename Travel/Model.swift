@@ -13,7 +13,6 @@ import PostgREST
 struct Experience: Identifiable, Codable { // ogni experience è unica, Codable = traduce obj Swift in JSON
     let id: UUID // il DB assegnerà un ID (stringa o UUID), per ora va benissimo UUID
     let title: String
-    let description: String
     let price: Double
     let image_name: String
     let partenza: String
@@ -22,6 +21,7 @@ struct Experience: Identifiable, Codable { // ogni experience è unica, Codable 
     let durata: Double
     let steps: [String]
     let type: TipologiaEnum
+    let difficoltà: DifficoltaEnum
     
     
     var publicImageURL: URL? {
@@ -39,8 +39,6 @@ struct Experience: Identifiable, Codable { // ogni experience è unica, Codable 
         return URL(string:link)
     }
     
-
-    
     
 }
 
@@ -50,13 +48,19 @@ enum TipologiaEnum: String, Codable, CaseIterable, Identifiable {
     case moto = "🏍️"
     case bici = "🚴🏻"
     
+    var id: String { self.rawValue } //self.rawValue restituisce il valore letterale associato all'enum
+}
+
+
+enum DifficoltaEnum: String, Codable, CaseIterable, Identifiable {
+    case easy = "semplice"
+    case medium = "medio"
+    case hard = "difficile"
+    
     var id: String { self.rawValue }
 }
 
 
-// next step:
-// 1) voglio capire come funziona bene addexperienceview e contentview
-// 2) Voglio aggiungere la modifica e l'eliminazione
 
 
 
