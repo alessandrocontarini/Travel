@@ -31,7 +31,7 @@ Travel/
 ├── ContentView.swift        # Schermata principale e lista dei viaggi
 ├── ExperienceDetailView.swift # Schermata di dettaglio dell'esperienza
 └── AddExperienceView.swift  # Modulo condiviso per Inserimento (INSERT) e Modifica (UPDATE)
-
+```
 
 ## ⚙️ Configurazione e Avvio
 
