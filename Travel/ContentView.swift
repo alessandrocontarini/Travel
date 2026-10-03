@@ -115,22 +115,40 @@ struct ContentView: View {
     
     // =====================================================================
     //funzione per eliminare l'esperienza dal db di Supabase
-    private func deleteExperience(at offsets: IndexSet){
-        Task{
-            for index in offsets{
+    // =====================================================================
+    // Funzione per eliminare l'esperienza dal db di Supabase (solo se è tua)
+    private func deleteExperience(at offsets: IndexSet) {
+        Task {
+            // Recuperiamo l'ID dell'utente attualmente loggato
+            guard let currentUserId = SupabaseManager.shared.client.auth.currentSession?.user.id else {
+                return
+            }
+
+            for index in offsets {
                 let experienceToDelete: Experience = experiences[index]
-                let id = experienceToDelete.id
                 
+                // CONTROLLO DI SICUREZZA: se l'ID non coincide, blocchiamo l'eliminazione
+                if experienceToDelete.user_id != currentUserId {
+                    print("Tentativo di eliminazione bloccato: non sei il proprietario di questa esperienza.")
+                    continue // Salva e salta questo elemento senza cancellarlo
+                }
+
+                let id = experienceToDelete.id
+               
                 do {
-                    try await SupabaseManager.shared.client.from("Experience").delete().eq("id", value: id).execute()
-                    
+                    try await SupabaseManager.shared.client
+                        .from("Experience")
+                        .delete()
+                        .eq("id", value: id)
+                        .execute()
+                   
                     print("Esperienza eliminata con successo")
-                }catch{
+                } catch {
                     print("Errore durante l'eliminazione su Supabase: \(error)")
                 }
             }
             
-            await fetchExperiences() //ricarica la lista
+            await fetchExperiences() // Ricarica la lista aggiornata
         }
     }
 }

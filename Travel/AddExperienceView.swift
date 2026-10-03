@@ -216,6 +216,8 @@ struct AddExperienceView: View {
             }
         }
 
+        let currentUserId = SupabaseManager.shared.client.auth.currentSession?.user.id
+        
         struct NewExperienceData: Encodable { // Encodable serve a impacchettare tutte le variabili in JSON pronto per il db
             let title: String
             let price: Double
@@ -226,7 +228,8 @@ struct AddExperienceView: View {
             let durata: Double
             let steps: [String]
             let type: String
-            let diff: String
+            let difficoltà: String
+            let user_id: UUID?
         }
 
         let newExp = NewExperienceData(
@@ -239,7 +242,8 @@ struct AddExperienceView: View {
             durata: durataDouble,
             steps: cleanedSteps,
             type: selectedTipologia.rawValue,
-            diff: selectedDifficolta.rawValue
+            difficoltà: selectedDifficolta.rawValue,
+            user_id: currentUserId
         )
 
         do {

@@ -22,6 +22,7 @@ struct Experience: Identifiable, Codable { // ogni experience è unica, Codable 
     let steps: [String]
     let type: TipologiaEnum
     let difficoltà: DifficoltaEnum
+    let user_id: UUID?
     
     
     var publicImageURL: URL? {

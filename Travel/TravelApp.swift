@@ -9,9 +9,17 @@ import SwiftUI
 
 @main
 struct TravelApp: App {
+    @StateObject private var supabaseManager = SupabaseManager.shared
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if supabaseManager.isAuthenticated {
+                    ContentView()
+                } else {
+                    AuthView()
+                }
+            }
         }
     }
 }
