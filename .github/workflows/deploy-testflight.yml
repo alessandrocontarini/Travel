@@ -1,0 +1,45 @@
+name: Deploy to TestFlight
+
+on:
+  push:
+    branches: [ "main" ] # Si attiva ad ogni push sul ramo principale
+
+jobs:
+  deploy:
+    runs-on: macos-latest # Necessario macOS per compilare app iOS
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Xcode version
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15.4' # Specifica la versione di Xcode adatta al tuo progetto
+
+    - name: Build and Archive App
+      run: |
+        # Compila il progetto creando l'archivio (.xcarchive) e l'eseguibile (.ipa)
+        # Nota: per la firma automatica o manuale avanzata, potresti aver bisogno di configurare i certificati nei Secret di GitHub
+        xcodebuild -project Travel.xcodeproj \
+                   -scheme Travel \
+                   -sdk iphoneos \
+                   -configuration Release \
+                   -archivePath $PWD/build/Travel.xcarchive \
+                   archive
+                   
+        xcodebuild -exportArchive \
+                   -archivePath $PWD/build/Travel.xcarchive \
+                   -exportOptionsPlist ExportOptions.plist \
+                   -exportPath $PWD/build/output
+      env:
+        # Se usi la firma automatica o gestisci i certificati
+        CODE_SIGN_STYLE: Automatic
+
+    - name: Upload to TestFlight
+      uses: apple-actions/upload-testflight-build@v5
+      with:
+        app-path: 'build/output/Travel.ipa'
+        issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+        api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+        api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
