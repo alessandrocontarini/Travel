@@ -36,7 +36,7 @@ Travel/
 ## ⚙️ Configurazione e Avvio
 
 * Clona il repository:
-git clone [https://github.com/tuo-username/Travel.git](https://github.com/tuo-username/Travel.git)
+git clone [https://github.com/alessandrocontarini/Travel.git](https://github.com/alessandrocontarini/Travel.git)
 
 * Apri il progetto in Xcode:
 Assicurati di avere installato Xcode sul tuo Mac e apri il file Travel.xcodeproj.
