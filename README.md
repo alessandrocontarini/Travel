@@ -8,7 +8,7 @@
 
 * **Esplorazione Interattiva**: Visualizza una lista completa delle esperienze di viaggio con dettagli su tappe, chilometri, durata, prezzi e tipologie.
 * **Gestione CRUD Completa**: Inserimento di nuove esperienze e modifica di quelle esistenti tramite un modulo dinamico (`AddExperienceView`).
-* **Tipologie Personalizzate**: Supporto per differenti categorie di viaggio gestite tramite un `Enum` dedicato.
+* **Tipologie Personalizzate**: Supporto per differenti categorie di viaggio e di difficoltà gestite tramite un `Enum` dedicato.
 * **Storage Immagini**: Caricamento e recupero sicuro delle immagini tramite il bucket di **Supabase Storage**.
 * **Mappe e Link**: Integrazione con link esterni e geolocalizzazione dei punti di partenza.
 
