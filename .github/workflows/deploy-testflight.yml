@@ -12,10 +12,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Xcode version
-      uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: '15.4' # Specifica la versione di Xcode adatta al tuo progetto
 
     - name: Build and Archive App
       run: |
